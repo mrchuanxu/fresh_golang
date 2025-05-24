@@ -1,8 +1,11 @@
 package try_test
 
 import (
+	"fmt"
+	"math/rand"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestFirstTry(t *testing.T) {
@@ -119,3 +122,61 @@ func TestStringFn(t *testing.T){
 	}
 	t.Log(strings.Join(parts,"_"))
 }
+
+
+func randMultiInt()(int,int){
+	return rand.Intn(10),rand.Intn(30)
+} 
+
+func TestFunc(t *testing.T){
+	t.Log(randMultiInt())
+}
+
+type InnerFunc func(int)int
+
+
+
+func timeSpent(inner InnerFunc)InnerFunc{
+	return func(n int)int{
+		start := time.Now()
+		ret := inner(n)
+		fmt.Println("time spent",time.Since(start).Seconds())
+		return ret
+	}
+}
+
+func slowFun(op int)int{
+	time.Sleep(time.Second)
+	return op
+}
+
+func TestFuncc(t *testing.T){
+	tssF := timeSpent(slowFun)
+	t.Log(tssF(10))
+}
+
+
+func Sum(ops ...int)int{
+	ret := 0
+	for _,op := range ops{
+		ret+=op
+	}
+	return ret
+}
+
+func TestVarParam(t *testing.T){
+	t.Log(Sum(1,2,3,4))
+}
+
+func Clear(){
+	fmt.Println("clear resources")
+}
+
+func TestDefer(t *testing.T){
+	defer Clear()
+	fmt.Println("Start")
+	panic("err")	
+}
+
+
+
