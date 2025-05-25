@@ -1,9 +1,14 @@
 package main
-import ("fmt"
-         "os" 
-       )
+
+import (
+	"fmt"
+	"os"
+	"trans_pack"
+)
 
 func main(){
     fmt.Println(os.Args[1])
-	os.Exit(0)
+	  trans_pack.NewMath()
+
 }
+
