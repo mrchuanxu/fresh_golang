@@ -3,10 +3,12 @@ package sourcetrans_test
 import (
 	"testing"
 
-	trans_pack "github.com/mrchuanxu/fresh_golang/easygolang/trans_pack"
+	transpack "github.com/mrchuanxu/fresh_golang/easygolang/trans_pack"
+	srcStd "github.com/mrchuanxu/fresh_golang/src/fmt"
 )
 
 
 func TestTransPack(t *testing.T) {
-	trans_pack.NewMath()
+	t.Log(transpack.NewMath())
+	srcStd.Println("hello world")
 }
