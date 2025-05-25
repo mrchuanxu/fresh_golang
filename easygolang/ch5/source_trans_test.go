@@ -2,10 +2,11 @@ package sourcetrans_test
 
 import (
 	"testing"
-	transpack "trans_pack"
+
+	trans_pack "github.com/mrchuanxu/fresh_golang/easygolang/trans_pack"
 )
 
 
-func TestSource(t *testing.T) {
-	t.Log(transpack.NewMath())
+func TestTransPack(t *testing.T) {
+	trans_pack.NewMath()
 }
