@@ -1,6 +1,7 @@
 package ch4_test
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"testing"
@@ -84,11 +85,70 @@ func TestSelecAndSwitch(t *testing.T){
 			fmt.Println("unknown")
 		}
 	}(1)
+}
 
 
-	select {
-	case ret := <- retCh1:
-		t.Logf("result %s",&ret)
-	
+func CancelChan(chann chan struct{}) bool{
+	select{
+	case <- chann:
+		return true
+	default:
+		return false
 	}
+}
+
+
+func Cancel_1(cancel chan struct{}){
+	cancel <- struct{}{}
+}
+
+func Cancel_2(cancel chan struct{}){
+	close(cancel)
+}
+
+
+func TestCancelChan(t *testing.T) {
+	cancel := make(chan struct{})
+
+	for i := 0; i < 10; i++ {
+	    go func(i int,cancel chan struct{}) {
+
+			for{
+				if CancelChan(cancel) {
+					break
+				}
+			}
+			fmt.Println("current goroutine", i, "exiting")
+		}(i,cancel)
+	}
+	Cancel_2(cancel)
+	time.Sleep(time.Second * 1)
+
+}
+
+
+
+func isCancelled(ctx context.Context)bool{
+	select{
+	case <-ctx.Done():
+		return true
+	default:
+		return false	
+	}
+}
+
+func TestCtxCancel(t *testing.T){
+	ctx,cancel := context.WithCancel(context.Background())
+	for i := 0; i < 10; i++ {
+	    go func(i int,ctx context.Context) {
+
+			for{
+				if isCancelled(ctx) {
+					break
+				}
+			}
+			fmt.Println("current goroutine", i, "exiting")
+		}(i,ctx)
+	}
+	cancel()
 }
