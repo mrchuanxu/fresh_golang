@@ -32,3 +32,16 @@ T(n)
     }	
 ```
 均摊 平均 最好 最坏的复杂度，可以通过运行程序的阅读计算出来。
+
+
+### 数组
+数组是一种线性表数据结构，用一组连续的内存空间来存储具有相同类型的数据
+```golang
+arr := [100]int{}
+```
+```
+a[k]_address = base_address + k * type_size
+m*n 数组， a[i][j] (i<m,j<n)
+a[k][j]_address = base_address + (i*n+j)*type_size
+```
+从0开始，减少CPU开销。数组支持快速下标随机访问。顺序查找和增删查改操作，都需要O(n),最快也要O(log(n))
