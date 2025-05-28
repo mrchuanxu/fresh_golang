@@ -10,3 +10,11 @@ go build -gcflags -S main.go
 ```go
 GOSSAFUNC=main go build main.go
 ```
+
+### 编译原理
+词法分析->语义分析->类型检查->中间代码生成->代码优化->机器码生成。
+
+### 数组
+![go数组源码](./array_source.png)
+数组的申请方式
+
