@@ -53,8 +53,28 @@ func (node *LinkNode) DeleteNode(link *LinkNode, val int) *LinkNode {
 }
 
 // Reverse the link
-func (node *LinkNode) Reverse(link *LinkNode) *LinkNode{
-	return nil
+func (node *LinkNode) Reverse(link *LinkNode) *LinkNode{ 
+	if link == nil {
+		return nil
+	}
+	pre := link
+	back := link.Next
+	reveLink := link.Next
+	pTmp := link
+
+	for link != nil{
+		if back == nil{
+			return reveLink
+		}
+		
+		link = back.Next
+		back.Next = pTmp // reverse the link
+		reveLink = back
+		pTmp = back
+		back = link
+	}
+	pre.Next = nil
+	return reveLink
 }
 
 func TestLinkInsertTail(t *testing.T) {
@@ -77,6 +97,8 @@ func TestLinkInsertHead(t *testing.T) {
 	linkNode = linkNode.InsertHead(linkNode, 4)
 	linkNode = linkNode.InsertHead(linkNode, 3)
 	linkNode = linkNode.InsertHead(linkNode, 4)
+
+	// linkNode = linkNode.Reverse(linkNode)
 	for linkNode != nil {
 		fmt.Printf("%d ", linkNode.Val)
 		linkNode = linkNode.Next
