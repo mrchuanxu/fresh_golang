@@ -3,7 +3,8 @@ package ch6alg_test
 import (
 	"fmt"
 	"testing"
-	"unsafe"
+
+	"github.com/mrchuanxu/vito_infra/alg"
 )
 
 func TestAlgTwo(t *testing.T) {
@@ -26,9 +27,18 @@ func TestAlgTwo(t *testing.T) {
 
 
 func TestArray(t *testing.T){
-	arr := [10]int{0,1,2,3,4,5,6,7,8,9}
+	arr := []int{4,1,2,0,3,6,5,7,8,9}
+	arr = alg.MergeSort(arr)
+	
+
 	for i:= 0;i<10;i++{
-        t.Logf("%x",unsafe.Pointer(&arr[i]))
+        t.Logf("%d",arr[i])
 	}
-	t.Logf("%d",unsafe.Sizeof(1))
+	
+	// for i:= 0;i<10;i++{
+    //     t.Logf("%x",unsafe.Pointer(&arr[i]))
+	// }
+	// t.Logf("%d",unsafe.Sizeof(1))
 }
+
+
