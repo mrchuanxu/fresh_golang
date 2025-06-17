@@ -68,3 +68,5 @@ tail == head empty
 循环队列的长度设定需要对并发数据有一定的预测，否则会丢失太多请求。
 
 ### 递归 推导公式，找到终止条件，避免嵌套过深。 递归还可能会存在堆栈溢出风险，解决方法是避免嵌套过深。
+
+### 二分查找 https://leetcode.com/problems/search-in-rotated-sorted-array/submissions/1667082015/
