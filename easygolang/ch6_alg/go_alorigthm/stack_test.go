@@ -80,3 +80,10 @@ func TestCircleQue(t *testing.T){
 	val,err = tqs.DeQue()
 	fmt.Println(val,err)
 }
+
+
+func TestFindBsearch(t *testing.T){
+	arr := []int{1,2,3,4,6,7,8,9,22,33}
+	loc := alg.BResearch(arr,0,len(arr)-1,9)
+	fmt.Println(loc)
+}

@@ -28,13 +28,14 @@ func TestAlgTwo(t *testing.T) {
 
 func TestArray(t *testing.T){
 	arr := []int{4,1,2,0,3,6,5,7,8,9}
-	arr = alg.MergeSort(arr)
+	alg.QuickSort(arr,0,len(arr)-1)
 	
 
 	for i:= 0;i<10;i++{
         t.Logf("%d",arr[i])
 	}
-	
+	nums := []int{4,5,6,7,0,1,2}
+	fmt.Println(alg.SearchNums(nums,0))
 	// for i:= 0;i<10;i++{
     //     t.Logf("%x",unsafe.Pointer(&arr[i]))
 	// }
