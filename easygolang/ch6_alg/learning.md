@@ -69,4 +69,67 @@ tail == head empty
 
 ### 递归 推导公式，找到终止条件，避免嵌套过深。 递归还可能会存在堆栈溢出风险，解决方法是避免嵌套过深。
 
-### 二分查找 https://leetcode.com/problems/search-in-rotated-sorted-array/submissions/1667082015/
+### 二分查找 [LeetCode题目链接](https://leetcode.com/problems/search-in-rotated-sorted-array/submissions/1667082015/)
+
+### 跳表 一种通过多层索引进行逐级下层查找的时间复杂度为mLogn的存储结构 用于redis
+
+### 散列表 支持随机访问且时间复杂度为O(1)，散列函数比较重要，避免散列冲突，通过装载因子判断散列性能
+A % B = A & (B - 1)
+hashmap的散列函数公式 return  hash ^ (hash >>> 16) &(capacity - 1)
+### 二叉树 顺序存储法 父 i 左2*i 右 2*i+1
+### 二叉查找树 左节点<根节点<右节点 O(logn) 频繁修改后容易退化为O(n)
+```
+// ...existing code...
+
+// 二叉树递归查找，返回找到的节点
+func BinaryTreeSearchNode(root *TreeNode, val int) *TreeNode {
+    if root == nil {
+        return nil
+    }
+    if root.Val == val {
+        return root
+    }
+    if val < root.Val {
+        return BinaryTreeSearchNode(root.Left, val)
+    }
+    return BinaryTreeSearchNode(root.Right, val)
+}
+
+// ...existing code...
+
+// ...existing code...
+
+// 二叉查找树删除操作，返回删除后的根节点
+func DeleteNode(root *TreeNode, key int) *TreeNode {
+    if root == nil {
+        return nil
+    }
+    if key < root.Val {
+        root.Left = DeleteNode(root.Left, key)
+    } else if key > root.Val {
+        root.Right = DeleteNode(root.Right, key)
+    } else {
+        // 找到要删除的节点
+        if root.Left == nil {
+            return root.Right
+        }
+        if root.Right == nil {
+            return root.Left
+        }
+        // 左右子树都不为空，找到右子树最小节点替换
+        minNode := root.Right
+        for minNode.Left != nil {
+            minNode = minNode.Left
+        }
+        root.Val = minNode.Val
+        root.Right = DeleteNode(root.Right, minNode.Val)
+    }
+    return root
+}
+```
+### 红黑树 近似平衡而非绝对平衡 维持时间复杂度能在 O(logn)
+红黑树作为一种近似平衡的二叉查找树，通过围绕关键左右旋以及改变颜色操作将整体二叉查找树维持近似平衡，让整体的增删查改维持在O(logn)，不会退化太严重。
+维持规则 1. 根节点是黑色的 2. 每个叶子结点都是黑色的空节点 3. 任何相邻的节点都不能同时为红色，一定是红黑。 4. 每个节点，从该节点到达其可达叶子节点的所有路径，都包含相同数量的黑色节点。
+
+
+
