@@ -4,6 +4,8 @@ go 1.24.3
 
 require github.com/mrchuanxu/vito_infra v0.1.2
 
+require github.com/emirpasic/gods v1.18.1 // indirect
+
 replace src => ../src
 
 replace google.golang.org/grpc v1.29.1 => google.golang.org/grpc v1.26.0
