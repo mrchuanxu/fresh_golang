@@ -43,3 +43,32 @@ func TestArray(t *testing.T){
 }
 
 
+func TestSelect(t *testing.T){
+	c,quit := make(chan int),make(chan int)
+    go func(){
+		for i := 0;i<100;i++{
+			c <- i
+		}
+		quit <- 1
+	}()
+	fibonacci(c,quit)
+}
+
+
+func fibonacci(c,quit chan int){
+	s,y := 0,1
+	for{
+		select{
+		case <-c:
+			s,y = y,s+y
+			fmt.Println(s)
+		case <- quit:
+			fmt.Println("quit")
+			return
+		default: // 防止阻塞
+			fmt.Println("default")
+		}
+	
+	}
+}
+

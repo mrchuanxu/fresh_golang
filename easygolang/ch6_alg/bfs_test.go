@@ -41,6 +41,7 @@ func TestBFSLinearGraph(t *testing.T) {
 	}
 }
 
+// 环形图测试只能用于单向图，双向图会死循环或者输出错误路径
 func TestBFSCyclicGraph(t *testing.T) {
 	fmt.Println("=== 环形图测试 ===")
 	

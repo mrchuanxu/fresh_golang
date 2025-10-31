@@ -180,3 +180,17 @@ func TestDefer(t *testing.T){
 
 
 
+func TestPanic(t *testing.T){
+	defer func(){
+		if err := recover();err!=nil{
+			t.Log("Error",err)
+		}
+	}()
+	panic("go panic")
+}
+
+func TestArr(t *testing.T){
+	arr1 := [...]int{1,2,3,4}
+	arr2 := [3]string{"a","b","c"}
+	
+}
