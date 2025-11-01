@@ -2,6 +2,7 @@ package goroutine_test
 
 import (
 	"fmt"
+	"iter"
 	"sync"
 	"testing"
 	"time"
@@ -301,9 +302,10 @@ func TestRune(t *testing.T){
 
 
 func TestGeneric(t *testing.T){
-	type Vector[T any] []T
-	 
-	
+	type MySlice []int
+
+	myslice := MySlice{1,2,3,4,5}
+	SlicesIndex(myslice,3)
 
 }
 
@@ -343,6 +345,28 @@ func (lst *List[T]) Allelements()[]T{
 	return elems
 }
 
+func (lst *List[T])All()iter.Seq[T]{
+	return func(yield func(T) bool){
+		for e := lst.head;e!= nil;e = e.next{
+			if !yield(e.val){
+				return
+			}
+		}
+	}
+}
+
+
+func genFib() iter.Seq[int]{
+	return func(yield func(int) bool){
+		a,b := 1,1
+		for {
+			if !yield(a){
+				return
+			}
+			a,b = b, a+b
+		}
+	}
+}
 
 
 func TestGenericElements(t *testing.T){
@@ -355,4 +379,88 @@ func TestGenericElements(t *testing.T){
 	}
 
 	fmt.Println(lst.Allelements())
+
+	for str := range lst.IterAll(){
+		// if str == "world"{
+		// 	fmt.Println("exist world stop")
+		// 	break
+		// }
+		fmt.Println(str)
+	}
+
+}
+
+// 避免内存的浪费
+func (lst *List[T])IterAll()iter.Seq[T]{
+	return func(yeild func(T)bool){
+		if lst == nil{
+			return
+		}
+		for e := lst.head;e != nil;e = e.next{
+			if !yeild(e.val){
+				return
+			}
+		}
+	}
+}
+
+
+func TestChannelMsgs(t *testing.T){
+	msgs := make(chan string,2)
+
+	msgs <- "buffed"
+	msgs <- "channle"
+
+	go func(){
+		for {
+			fmt.Println("wait")
+			val := <- msgs
+		    msgs <- "str"
+			fmt.Println(val,"wait done")
+			time.Sleep(5 * time.Second)
+			break
+
+	    }
+	}()
+	time.Sleep(10*time.Second)
+}
+
+
+func TestSelectChannel(t *testing.T){
+	msgs := make(chan string)
+
+
+	msg := "hi"
+
+	go func(){
+		fmt.Println(<-msgs)
+	}()
+    time.Sleep(time.Second)
+	select{
+	case msgs <- msg:
+		fmt.Println("msg recevied")
+	default:
+		fmt.Println("msg not recevied")
+	}
+	time.Sleep(2* time.Second)
+
+}
+
+func TestChannelTry(t *testing.T){
+	queue := make(chan string,2)
+
+	queue <- "one"
+	queue <- "two"
+	go func(){
+		ns := time.Now().Second()
+		for {
+			queue<-"one"
+			if time.Now().Second() - ns > 2{
+				close(queue)
+			}
+		}
+	}()
+	for elem := range queue{
+		fmt.Println(elem)
+	}
 }
