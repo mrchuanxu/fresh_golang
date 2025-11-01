@@ -451,16 +451,41 @@ func TestChannelTry(t *testing.T){
 
 	queue <- "one"
 	queue <- "two"
-	go func(){
-		ns := time.Now().Second()
-		for {
-			queue<-"one"
-			if time.Now().Second() - ns > 2{
-				close(queue)
-			}
-		}
-	}()
+	// go func(){
+	// 	ns := time.Now().Second()
+	// 	for {
+	// 		queue<-"one"
+	// 		if time.Now().Second() - ns > 2{
+	// 			close(queue)
+	// 		}
+	// 	}
+	// }()
+	close(queue)
 	for elem := range queue{
 		fmt.Println(elem)
 	}
+}
+
+
+
+func TestTicker(t *testing.T){
+	timeTicker := time.NewTicker(3 * time.Second)
+
+	doneCh := make(chan int)
+
+	go func(){
+		for{
+			select{
+			case <-doneCh:
+				return
+			case t:=<-timeTicker.C:
+				fmt.Println("timeTicker:",t)
+			}
+		}
+	}()
+
+	time.Sleep(5 * time.Second)
+	timeTicker.Stop()
+	doneCh<-1
+
 }
