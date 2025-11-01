@@ -5,6 +5,7 @@ import (
 	"sync"
 	"testing"
 	"time"
+	"unicode/utf8"
 )
 
 func TestMultiRead(t *testing.T) {
@@ -245,4 +246,113 @@ func fact(n int) int{
 	}
 
 	return n*fact(n - 1)
+}
+
+func fib(i int) int{
+	if i <=2{
+		return i
+	}
+
+	return fib(i-1) + fib(i-2)
+}
+
+
+func TestPointers(t *testing.T){
+	var iptr *int
+	beptr := 9
+	iptr = &beptr
+	fmt.Println(*iptr)
+	*iptr = 10
+	fmt.Println(beptr)
+}
+
+
+func TestRune(t *testing.T){
+	const s = "สวัสดี"
+
+	fmt.Println("Len: ",len(s))
+
+	for i := 0;i<len(s);i++{
+		fmt.Printf("%x",s[i])
+	}
+
+	fmt.Println("rune count",utf8.RuneCountInString(s))
+
+
+	const ss = "hello，我的朋友trans"
+
+	// bytes := []byte(ss)
+
+	// for i,b := range bytes{
+	// 	fmt.Printf("字节 %d:%08b (0x%02x) -> %q\n",i,b,b,b)
+	// }
+
+	runes := []rune(ss)
+
+	fmt.Println(runes)
+
+	for i, r := range runes {
+        fmt.Printf("  字符 %d: %c (U+%04X)\n", i, r, r)
+        // 显示该字符的UTF-8编码
+        charBytes := []byte(string(r))
+        fmt.Printf("        UTF-8编码: % x\n", charBytes)
+    }
+}
+
+
+func TestGeneric(t *testing.T){
+	type Vector[T any] []T
+	 
+	
+
+}
+
+func SlicesIndex[S ~[]E,E comparable](s S,v E)int{
+	for i := range s{
+		if v == s[i]{
+			return i
+		}
+	}
+	return -1
+}
+
+type List[T any] struct{
+	head,tail *element[T]
+}
+
+type element[T any] struct{
+	next *element[T]
+	val T
+}
+
+func (lst *List[T]) Push(v T){
+	if lst.tail == nil{
+		lst.head = &element[T]{val:v}
+		lst.tail = lst.head
+	}else{
+		lst.tail.next = &element[T]{val:v}
+		lst.tail = lst.tail.next
+	}
+}
+
+func (lst *List[T]) Allelements()[]T{
+	var elems []T
+	for e := lst.head;e!= nil;e = e.next{
+		elems = append(elems, e.val)
+	}
+	return elems
+}
+
+
+
+func TestGenericElements(t *testing.T){
+	var s = []string{"hello","world","network"}
+
+	lst := List[string]{}
+
+	for i:=0;i<len(s);i++{
+		lst.Push(s[i])
+	}
+
+	fmt.Println(lst.Allelements())
 }
