@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"iter"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 	"unicode/utf8"
@@ -487,5 +488,75 @@ func TestTicker(t *testing.T){
 	time.Sleep(5 * time.Second)
 	timeTicker.Stop()
 	doneCh<-1
+}
 
+
+
+func TestAtomicCounters(t *testing.T){
+	var ops atomic.Uint64
+	var wg sync.WaitGroup
+
+	for range 60{
+		wg.Add(1)
+		// 非原子操作测试正常不代表没有数据竞争
+		go func(){
+			defer wg.Done()
+			for range 1000{
+				// 原子操作保证了数据操作的正确性
+				ops.Add(1)
+			}
+		}()
+	}
+	wg.Wait()
+	fmt.Println("ops:",ops.Load())
+}
+
+
+type Container struct{
+	mu sync.Mutex
+	counters map[string]int
+}
+
+func (c *Container) inc(name string){
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.counters[name]++
+}
+
+
+func TestMutexContainer(t *testing.T){
+	c:= Container{
+		counters:map[string]int{
+			"a":0,"b":0,
+		},
+	}
+
+	var wg sync.WaitGroup
+	doInc := func(name string,n int){
+		wg.Add(1)
+		defer wg.Done()
+		for range n{
+			c.inc(name)
+		}
+	}
+
+	
+	for range 10{
+		go doInc("a",10)
+		go doInc("b",10)
+	}
+
+	wg.Wait()
+	fmt.Print(c.counters)
+}
+
+
+// https://gobyexample.com/ Spawning Process and execint process signals project 少用，因此先做一下笔记就好了
+
+func BenchmarkMultiple(b *testing.B) {
+	for b.Loop(){
+		func(a,b int){
+			a = a+b
+		}(1,2)
+	}
 }
