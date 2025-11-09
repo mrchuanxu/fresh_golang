@@ -560,3 +560,62 @@ func BenchmarkMultiple(b *testing.B) {
 		}(1,2)
 	}
 }
+
+
+
+
+// 线程有规律交替运行
+
+func RunLoop(alph string){
+	fmt.Printf("%s",alph)
+}
+
+func AlterNatingLoops(){
+	 chanA,chanB,chanC := make(chan int),make(chan int),make(chan int)
+
+	 var wg sync.WaitGroup
+	 // 通知协程停止执行
+	 stop := make(chan struct{})
+	 var totalRun int32 = 400
+	 wg.Add(3)
+	 go alterLoop(chanA,chanB,stop,&totalRun,"A",&wg)
+	 go alterLoop(chanB,chanC,stop,&totalRun,"B",&wg)
+	 go alterLoop(chanC,chanA,stop,&totalRun,"C",&wg)
+	// 启动
+	chanA <- 0
+
+	wg.Wait()
+	
+}
+
+
+func alterLoop(chanIn chan int,chanOut chan int,stop chan struct{},totalRun *int32,str string,wg *sync.WaitGroup){
+	defer wg.Done()
+	for {
+		// 优先执行stop 终止协程
+		select{
+		case <-stop:
+			return
+		case _,ok := <- chanIn:
+			if !ok{
+				return
+			}
+			RunLoop(str)
+			if atomic.AddInt32(totalRun,-1) == 0{
+				close(stop)
+				return
+			}
+			// chanOut <- 0
+			select{
+			case <-stop:
+				return
+			case chanOut <-0:
+			}
+		}
+	}
+}
+
+
+func TestChan(t *testing.T){
+	AlterNatingLoops()
+}
