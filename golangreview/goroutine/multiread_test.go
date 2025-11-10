@@ -566,56 +566,51 @@ func BenchmarkMultiple(b *testing.B) {
 
 // 线程有规律交替运行
 
-func RunLoop(alph string){
+func RunPrint(alph string){
 	fmt.Printf("%s",alph)
 }
 
-func AlterNatingLoops(){
-	 chanA,chanB,chanC := make(chan int),make(chan int),make(chan int)
 
-	 var wg sync.WaitGroup
-	 // 通知协程停止执行
-	 stop := make(chan struct{})
-	 var totalRun int32 = 400
-	 wg.Add(3)
-	 go alterLoop(chanA,chanB,stop,&totalRun,"A",&wg)
-	 go alterLoop(chanB,chanC,stop,&totalRun,"B",&wg)
-	 go alterLoop(chanC,chanA,stop,&totalRun,"C",&wg)
-	// 启动
-	chanA <- 0
-
+func AlternatingLoops(){
+	// three channel ensure comunicate
+	chanA,chanB,chanC,stop := make(chan struct{}),make(chan struct{}),make(chan struct{}),make(chan struct{})
+	var wg sync.WaitGroup
+	var totalRun int32 = 300
+	wg.Add(3)
+	go alterRun(chanA,chanB,stop,&totalRun,"A",&wg)
+	go alterRun(chanB,chanC,stop,&totalRun,"B",&wg)
+	go alterRun(chanC,chanA,stop,&totalRun,"C",&wg)
+	chanA <- struct{}{}
 	wg.Wait()
-	
+
 }
 
 
-func alterLoop(chanIn chan int,chanOut chan int,stop chan struct{},totalRun *int32,str string,wg *sync.WaitGroup){
+func alterRun(in,out,stop chan struct{},totalRun *int32,str string,wg *sync.WaitGroup){
 	defer wg.Done()
+
 	for {
-		// 优先执行stop 终止协程
 		select{
 		case <-stop:
 			return
-		case _,ok := <- chanIn:
+		case _,ok := <-in:
 			if !ok{
 				return
 			}
-			RunLoop(str)
+			RunPrint(str)
 			if atomic.AddInt32(totalRun,-1) == 0{
 				close(stop)
 				return
 			}
-			// chanOut <- 0
 			select{
+			case out<-struct{}{}:
 			case <-stop:
 				return
-			case chanOut <-0:
 			}
 		}
 	}
 }
 
-
 func TestChan(t *testing.T){
-	AlterNatingLoops()
+	AlternatingLoops()
 }
