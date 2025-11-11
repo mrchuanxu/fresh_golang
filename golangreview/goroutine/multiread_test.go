@@ -1,6 +1,7 @@
 package goroutine_test
 
 import (
+	"context"
 	"fmt"
 	"iter"
 	"sync"
@@ -613,4 +614,78 @@ func alterRun(in,out,stop chan struct{},totalRun *int32,str string,wg *sync.Wait
 
 func TestChan(t *testing.T){
 	AlternatingLoops()
+	fmt.Println(Rundefer())
+}
+
+
+func Rundefer()(a,b int){
+	defer func(){
+		a = 1
+	}()
+	return a,b
+}
+
+
+func TestBufferChannel(t *testing.T){
+	chanBuff,stop := make(chan int,10),make(chan struct{})
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func(){
+		defer wg.Done()
+		var i int = 0
+		for {
+			if i <= 100{
+		        chanBuff <- i
+				i++
+				fmt.Printf("len chanbuff: %d\n",len(chanBuff))
+			}else{
+				close(chanBuff)
+				// close(stop)
+				return
+			}
+		}
+	}()
+
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		for{
+		    select{
+		    case num,ok := <-chanBuff:
+			    if !ok{
+					fmt.Println("sorry chan is close")
+					return
+			    }
+				fmt.Printf("process %d\n",num)
+			case <-stop:
+				return
+		}
+	}
+	}()
+	go func ()  {
+		defer wg.Done()
+		for {
+			 select{
+		    case num,ok := <-chanBuff:
+			    if !ok{
+					fmt.Println("sorry chan is close")
+					return
+			    }
+				fmt.Printf("process2 %d\n",num)
+			case <-stop:
+				return
+		}
+	}
+	}()
+	wg.Wait()
+	
+}
+
+
+func TestExcute(t *testing.T){
+	contextFather,cancel := context.WithCancel(context.Background())
+	
+	ctx1 := contextFather
+	go func(ctx context.Context){}()
 }
