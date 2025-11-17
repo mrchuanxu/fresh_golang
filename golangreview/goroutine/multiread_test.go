@@ -1,7 +1,7 @@
 package goroutine_test
 
 import (
-	"context"
+	"encoding/json"
 	"fmt"
 	"iter"
 	"sync"
@@ -629,7 +629,6 @@ func Rundefer()(a,b int){
 func TestBufferChannel(t *testing.T){
 	chanBuff,stop := make(chan int,10),make(chan struct{})
 	var wg sync.WaitGroup
-
 	wg.Add(1)
 	go func(){
 		defer wg.Done()
@@ -683,9 +682,21 @@ func TestBufferChannel(t *testing.T){
 }
 
 
-func TestExcute(t *testing.T){
-	contextFather,cancel := context.WithCancel(context.Background())
+// func TestExcute(t *testing.T){
+// 	contextFather,cancel := context.WithCancel(context.Background())
 	
-	ctx1 := contextFather
-	go func(ctx context.Context){}()
+// 	ctx1 := contextFather
+// 	go func(ctx context.Context){}()
+// }
+
+type User struct{
+	ID int `json:"id"`
+	Name string `json:"name"`
+}
+
+func TestMarshal(t *testing.T){
+	user := User{ID: 1,Name: "Alice"}
+
+	data,_:= json.Marshal(user)
+	fmt.Println(string(data))
 }
