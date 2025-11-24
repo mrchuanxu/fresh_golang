@@ -1,5 +1,13 @@
 package oop
 
+import (
+	"fmt"
+)
+
+func init(){
+	fmt.Println("hello oop")
+}
+
 type Animal struct {
 	Name               string `json:"name"`
 	Age                int    `json:"age"`

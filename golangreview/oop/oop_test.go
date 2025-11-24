@@ -2,10 +2,12 @@ package oop_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/mrchuanxu/fresh_golang/golangreview/oop"
 )
@@ -116,3 +118,104 @@ func TestContextChild(t *testing.T){
 	cancel1()
 	wg.Wait()
 }
+
+
+// 电梯调度系统
+func TestElevator(t *testing.T){
+
+}
+
+
+// 获取电梯不允许其他资源占用 一共两台电梯
+type Elevator struct{
+	Mux sync.Mutex
+	sumPeople uint64
+	
+}
+
+// People 12
+func UpPeople(e *Elevator,upNum uint64)error{
+	e.Mux.Lock()
+	defer e.Mux.Unlock()
+	// 如果满员就报错
+	if atomic.AddUint64(&e.sumPeople,upNum) >= 12{
+		return errors.New("full people")
+	}
+
+	return nil
+}
+
+func DownPeople(e *Elevator,upNum uint64)error{
+	e.Mux.Lock()
+	defer e.Mux.Unlock()
+	atomic.AddUint64(&e.sumPeople,-upNum)
+	return nil
+}
+
+
+type QNode struct{
+	Num int
+	Next *QNode
+	Pre *QNode
+}
+
+type TQueue struct{
+	mux *sync.Mutex
+	Head *QNode
+	Tail *QNode
+}
+
+func InitQue()*TQueue{
+	return &TQueue{
+		mux: &sync.Mutex{},
+	}
+}
+
+
+func (t *TQueue) InQue(node *QNode){
+	defer t.mux.Unlock()
+	t.mux.Lock()
+	if t.Head == nil{
+		t.Head = node
+	}
+	if t.Tail == nil{
+		t.Tail = node
+		return
+	}
+	
+	t.Tail.Next = node
+	t.Tail = t.Tail.Next
+}
+
+func (t *TQueue) DeQue()*QNode{
+	defer t.mux.Unlock()
+	t.mux.Lock()
+	if t.Head != nil{
+		deNode := t.Head
+		t.Head = t.Head.Next
+		return deNode
+	}
+	return nil
+}
+
+func(t *TQueue)HeadQue()*QNode{
+	return t.Head
+}
+
+func TestQuemulti(t *testing.T){
+	tQue := InitQue()
+	for i:= 0;i<30;i++{
+		go tQue.InQue(&QNode{
+			Num: i,
+		})
+	}
+
+	time.Sleep(5*time.Second)
+
+	for tQue.Head != nil{
+		fmt.Println(tQue.DeQue().Num)
+	}
+}
+
+
+// 模拟内存 出发gc
